@@ -103,9 +103,7 @@ struct meta_func_node {
 
 struct meta_type_node {
     using size_type = std::size_t;
-    meta_type_node * const context;
     ENTT_ID_TYPE identifier;
-    meta_type_node ** hook;
     meta_type_node * next;
     meta_prop_node * prop;
     const bool is_void;
@@ -202,15 +200,16 @@ template<>
 struct meta_node<> {
     inline static meta_type_node *local = nullptr;
     inline static meta_type_node **global = &local;
-    inline static meta_type_node *context = nullptr;
 
     static void reset(meta_type_node *node) ENTT_NOEXCEPT {
-        if(node->hook) {
-            *node->hook = node->next;
+        auto **it = global;
 
-            if(node->next) {
-                node->next->hook = node->hook;
-            }
+        while(*it && *it != node) {
+            it = &(*it)->next;
+        }
+
+        if(*it) {
+            *it = (*it)->next;
         }
 
         const auto unregister_all = y_combinator{
@@ -232,7 +231,6 @@ struct meta_node<> {
         unregister_all(&node->func, &internal::meta_func_node::prop);
 
         node->identifier = {};
-        node->hook = nullptr;
         node->next = nullptr;
         node->dtor = nullptr;
     }
@@ -245,13 +243,7 @@ struct meta_node<Type> {
 
     static meta_type_node * resolve() ENTT_NOEXCEPT {
         static meta_type_node node{
-            []() {
-                auto *curr = meta_node<>::context;
-                meta_node<>::context = &node;
-                return curr;
-            }(),
             {},
-            nullptr,
             nullptr,
             nullptr,
             std::is_void_v<Type>,
