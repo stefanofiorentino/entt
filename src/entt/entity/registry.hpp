@@ -54,7 +54,7 @@ class basic_registry {
     struct pool_handler: storage<Entity, Component> {
         std::size_t super{};
 
-        pool_handler() ENTT_NOEXCEPT = default;
+        pool_handler() = default;
 
         template<typename... Args>
         pool_handler(Args &&... args)
@@ -290,7 +290,7 @@ public:
     using size_type = std::size_t;
 
     /*! @brief Default constructor. */
-    basic_registry() ENTT_NOEXCEPT = default;
+    basic_registry() = default;
 
     /*! @brief Default move constructor. */
     basic_registry(basic_registry &&) = default;
@@ -334,7 +334,7 @@ public:
      * @return Number of existing components of the given type.
      */
     template<typename Component>
-    size_type size() const ENTT_NOEXCEPT {
+    size_type size() const {
         return assure<Component>()->size();
     }
 
@@ -350,7 +350,7 @@ public:
      * @brief Returns the number of entities still in use.
      * @return Number of entities still in use.
      */
-    size_type alive() const ENTT_NOEXCEPT {
+    size_type alive() const {
         auto sz = entities.size();
         auto curr = destroyed;
 
@@ -389,7 +389,7 @@ public:
      * @return Capacity of the pool of the given component.
      */
     template<typename Component>
-    size_type capacity() const ENTT_NOEXCEPT {
+    size_type capacity() const {
         return assure<Component>()->capacity();
     }
 
@@ -424,7 +424,7 @@ public:
      * empty, false otherwise.
      */
     template<typename... Component>
-    bool empty() const ENTT_NOEXCEPT {
+    bool empty() const {
         if constexpr(sizeof...(Component) == 0) {
             return !alive();
         } else {
@@ -450,13 +450,13 @@ public:
      * @return A pointer to the array of components of the given type.
      */
     template<typename Component>
-    const Component * raw() const ENTT_NOEXCEPT {
+    const Component * raw() const {
         return assure<Component>()->raw();
     }
 
     /*! @copydoc raw */
     template<typename Component>
-    Component * raw() ENTT_NOEXCEPT {
+    Component * raw() {
         return const_cast<Component *>(std::as_const(*this).template raw<Component>());
     }
 
@@ -474,7 +474,7 @@ public:
      * @return A pointer to the array of entities.
      */
     template<typename Component>
-    const entity_type * data() const ENTT_NOEXCEPT {
+    const entity_type * data() const {
         return assure<Component>()->data();
     }
 
@@ -483,7 +483,7 @@ public:
      * @param entity An entity identifier, either valid or not.
      * @return True if the identifier is valid, false otherwise.
      */
-    bool valid(const entity_type entity) const ENTT_NOEXCEPT {
+    bool valid(const entity_type entity) const {
         const auto pos = size_type(to_integer(entity) & traits_type::entity_mask);
         return (pos < entities.size() && entities[pos] == entity);
     }
@@ -519,7 +519,7 @@ public:
      * @param entity A valid entity identifier.
      * @return Actual version for the given entity identifier.
      */
-    version_type current(const entity_type entity) const ENTT_NOEXCEPT {
+    version_type current(const entity_type entity) const {
         const auto pos = size_type(to_integer(entity) & traits_type::entity_mask);
         ENTT_ASSERT(pos < entities.size());
         return version_type(to_integer(entities[pos]) >> traits_type::entity_shift);
@@ -728,7 +728,7 @@ public:
      * @return True if the entity has all the components, false otherwise.
      */
     template<typename... Component>
-    bool has(const entity_type entity) const ENTT_NOEXCEPT {
+    bool has(const entity_type entity) const {
         ENTT_ASSERT(valid(entity));
         return (assure<Component>()->has(entity) && ...);
     }
@@ -760,7 +760,7 @@ public:
 
     /*! @copydoc get */
     template<typename... Component>
-    decltype(auto) get([[maybe_unused]] const entity_type entity) ENTT_NOEXCEPT {
+    decltype(auto) get([[maybe_unused]] const entity_type entity) {
         ENTT_ASSERT(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
@@ -795,7 +795,7 @@ public:
      * @return Reference to the component owned by the entity.
      */
     template<typename Component, typename... Args>
-    decltype(auto) get_or_assign(const entity_type entity, Args &&... args) ENTT_NOEXCEPT {
+    decltype(auto) get_or_assign(const entity_type entity, Args &&... args) {
         ENTT_ASSERT(valid(entity));
         auto *cpool = assure<Component>();
         return cpool->has(entity) ? cpool->get(entity) : cpool->assign(*this, entity, std::forward<Args>(args)...);
@@ -814,7 +814,7 @@ public:
      * @return Pointers to the components owned by the entity.
      */
     template<typename... Component>
-    auto try_get([[maybe_unused]] const entity_type entity) const ENTT_NOEXCEPT {
+    auto try_get([[maybe_unused]] const entity_type entity) const {
         ENTT_ASSERT(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
@@ -826,7 +826,7 @@ public:
 
     /*! @copydoc try_get */
     template<typename... Component>
-    auto try_get([[maybe_unused]] const entity_type entity) ENTT_NOEXCEPT {
+    auto try_get([[maybe_unused]] const entity_type entity) {
         if constexpr(sizeof...(Component) == 1) {
             return (assure<Component>()->try_get(entity), ...);
         } else {
@@ -1057,7 +1057,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Component>
-    auto on_construct() ENTT_NOEXCEPT {
+    auto on_construct() {
         return assure<Component>()->on_construct();
     }
 
@@ -1088,7 +1088,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Component>
-    auto on_replace() ENTT_NOEXCEPT {
+    auto on_replace() {
         return assure<Component>()->on_replace();
     }
 
@@ -1120,7 +1120,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Component>
-    auto on_destroy() ENTT_NOEXCEPT {
+    auto on_destroy() {
         return assure<Component>()->on_destroy();
     }
 
@@ -1272,7 +1272,7 @@ public:
      * otherwise.
      */
     template<typename... Component>
-    bool sortable() const ENTT_NOEXCEPT {
+    bool sortable() const {
         return !(assure<Component>()->super || ...);
     }
 
@@ -1607,7 +1607,7 @@ public:
      *
      * @return A temporary object to use to take snasphosts.
      */
-    entt::basic_snapshot<Entity> snapshot() const ENTT_NOEXCEPT {
+    entt::basic_snapshot<Entity> snapshot() const {
         using follow_fn_type = entity_type(const basic_registry &, const entity_type);
 
         const auto head = to_integer(destroyed);
@@ -1638,7 +1638,7 @@ public:
      *
      * @return A temporary object to use to load snasphosts.
      */
-    basic_snapshot_loader<Entity> loader() ENTT_NOEXCEPT {
+    basic_snapshot_loader<Entity> loader() {
         using force_fn_type = void(basic_registry &, const entity_type, const bool);
 
         force_fn_type *force = [](basic_registry &reg, const entity_type entity, const bool discard) {
@@ -1737,7 +1737,7 @@ public:
      * registry, a null pointer otherwise.
      */
     template<typename Type>
-    const Type * try_ctx() const ENTT_NOEXCEPT {
+    const Type * try_ctx() const {
         const auto it = std::find_if(vars.begin(), vars.end(), [](const auto &var) {
             return var.runtime_type == runtime_type<Type, context_family>();
         });
@@ -1747,7 +1747,7 @@ public:
 
     /*! @copydoc try_ctx */
     template<typename Type>
-    Type * try_ctx() ENTT_NOEXCEPT {
+    Type * try_ctx() {
         return const_cast<Type *>(std::as_const(*this).template try_ctx<Type>());
     }
 
@@ -1764,7 +1764,7 @@ public:
      * @return A valid reference to the object in the context of the registry.
      */
     template<typename Type>
-    const Type & ctx() const ENTT_NOEXCEPT {
+    const Type & ctx() const {
         const auto *instance = try_ctx<Type>();
         ENTT_ASSERT(instance);
         return *instance;
@@ -1772,7 +1772,7 @@ public:
 
     /*! @copydoc ctx */
     template<typename Type>
-    Type & ctx() ENTT_NOEXCEPT {
+    Type & ctx() {
         return const_cast<Type &>(std::as_const(*this).template ctx<Type>());
     }
 
