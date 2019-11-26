@@ -1,14 +1,9 @@
-#include <entt/core/type_traits.hpp>
-
-ENTT_NAMED_STRUCT(position, {
+struct position {
     int x;
     int y;
-});
+};
 
-ENTT_NAMED_STRUCT(velocity, {
+struct velocity {
     int dx;
     int dy;
-});
-
-ENTT_NAMED_TYPE(int);
-ENTT_NAMED_TYPE(char);
+};

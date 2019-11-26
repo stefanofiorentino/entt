@@ -117,46 +117,21 @@ class emitter {
 
     struct handler_data {
         std::unique_ptr<base_handler> handler;
-        ENTT_ID_TYPE runtime_type;
     };
 
     template<typename Event>
-    static auto type() ENTT_NOEXCEPT {
-        if constexpr(is_named_type_v<Event>) {
-            return named_type_traits_v<Event>;
-        } else {
-            return handler_family::type<std::decay_t<Event>>;
-        }
-    }
-
-    template<typename Event>
     event_handler<Event> * assure() const {
-        const auto htype = type<Event>();
-        handler_data *hdata = nullptr;
+        const auto htype = handler_family::type<std::decay_t<Event>>;
 
-        if constexpr(is_named_type_v<Event>) {
-            const auto it = std::find_if(handlers.begin(), handlers.end(), [htype](const auto &candidate) {
-                return candidate.handler && candidate.runtime_type == htype;
-            });
-
-            hdata = (it == handlers.cend() ? &handlers.emplace_back() : &(*it));
-        } else {
-            if(!(htype < handlers.size())) {
-                handlers.resize(htype+1);
-            } else if(handlers[htype].handler && handlers[htype].runtime_type != htype) {
-                handlers.emplace_back();
-                std::swap(handlers[htype], handlers.back());
-            }
-
-            hdata = &handlers[htype];
+        if(!(htype < handlers.size())) {
+            handlers.resize(htype+1);
         }
 
-        if(!hdata->handler) {
-            hdata->handler = std::make_unique<event_handler<Event>>();
-            hdata->runtime_type = htype;
+        if(!handlers[htype].handler) {
+            handlers[htype].handler = std::make_unique<event_handler<Event>>();
         }
 
-        return static_cast<event_handler<Event> *>(hdata->handler.get());
+        return static_cast<event_handler<Event> *>(handlers[htype].handler.get());
     }
 
 public:

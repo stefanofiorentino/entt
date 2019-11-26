@@ -1,13 +1,14 @@
 #include <gtest/gtest.h>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/lib/attribute.h>
 #include "types.h"
 
-extern typename entt::component int_type();
-extern typename entt::component char_type();
+ENTT_IMPORT typename entt::component int_type();
+ENTT_IMPORT typename entt::component char_type();
 
-extern void update_position(int, entt::registry &);
-extern void assign_velocity(int, entt::registry &);
+ENTT_IMPORT void update_position(int, entt::registry &);
+ENTT_IMPORT void assign_velocity(int, entt::registry &);
 
 TEST(Lib, Types) {
     entt::registry registry;

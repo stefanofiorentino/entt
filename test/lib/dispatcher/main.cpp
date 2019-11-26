@@ -1,8 +1,11 @@
+#define ENTT_API_IMPORT
+
 #include <gtest/gtest.h>
+#include <entt/lib/attribute.h>
 #include <entt/signal/dispatcher.hpp>
 #include "types.h"
 
-extern void trigger_event(int, entt::dispatcher &);
+ENTT_IMPORT void trigger_event(int, entt::dispatcher &);
 
 struct listener {
     void on_int(int) { FAIL(); }

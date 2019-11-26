@@ -11,10 +11,15 @@
 #include "../config/config.h"
 #include "../core/family.hpp"
 #include "../core/type_traits.hpp"
+#include "../lib/attribute.h"
 #include "sigh.hpp"
 
 
 namespace entt {
+
+
+/*! @brief Dispatcher generator. */
+struct ENTT_API dispatcher_generator: family<dispatcher_generator> {};
 
 
 /**
@@ -31,8 +36,6 @@ namespace entt {
  * crashes.
  */
 class dispatcher {
-    using event_family = family<struct internal_dispatcher_event_family>;
-
     template<typename Class, typename Event>
     using instance_type = typename sigh<void(const Event &)>::template instance_type<Class>;
 
@@ -82,46 +85,21 @@ class dispatcher {
 
     struct wrapper_data {
         std::unique_ptr<base_wrapper> wrapper;
-        ENTT_ID_TYPE runtime_type;
     };
 
     template<typename Event>
-    static auto type() ENTT_NOEXCEPT {
-        if constexpr(is_named_type_v<Event>) {
-            return named_type_traits_v<Event>;
-        } else {
-            return event_family::type<std::decay_t<Event>>;
-        }
-    }
-
-    template<typename Event>
     signal_wrapper<Event> & assure() {
-        const auto wtype = type<Event>();
-        wrapper_data *wdata = nullptr;
+        const auto wtype = dispatcher_generator::type<std::decay_t<Event>>;
 
-        if constexpr(is_named_type_v<Event>) {
-            const auto it = std::find_if(wrappers.begin(), wrappers.end(), [wtype](const auto &candidate) {
-                return candidate.wrapper && candidate.runtime_type == wtype;
-            });
-
-            wdata = (it == wrappers.cend() ? &wrappers.emplace_back() : &(*it));
-        } else {
-            if(!(wtype < wrappers.size())) {
-                wrappers.resize(wtype+1);
-            } else if(wrappers[wtype].wrapper && wrappers[wtype].runtime_type != wtype) {
-                wrappers.emplace_back();
-                std::swap(wrappers[wtype], wrappers.back());
-            }
-
-            wdata = &wrappers[wtype];
+        if(!(wtype < wrappers.size())) {
+            wrappers.resize(wtype+1);
         }
 
-        if(!wdata->wrapper) {
-            wdata->wrapper = std::make_unique<signal_wrapper<Event>>();
-            wdata->runtime_type = wtype;
+        if(!wrappers[wtype].wrapper) {
+            wrappers[wtype].wrapper = std::make_unique<signal_wrapper<Event>>();
         }
 
-        return static_cast<signal_wrapper<Event> &>(*wdata->wrapper);
+        return static_cast<signal_wrapper<Event> &>(*wrappers[wtype].wrapper);
     }
 
 public:

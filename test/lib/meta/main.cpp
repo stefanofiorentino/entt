@@ -1,10 +1,11 @@
 #include <gtest/gtest.h>
+#include <entt/lib/attribute.h>
 #include <entt/meta/factory.hpp>
 #include "types.h"
 
-extern void bind_ctx(entt::meta_ctx);
-extern void meta_init();
-extern void meta_deinit();
+ENTT_IMPORT void bind_ctx(entt::meta_ctx);
+ENTT_IMPORT void meta_init();
+ENTT_IMPORT void meta_deinit();
 
 TEST(Lib, Meta) {
     ASSERT_FALSE(entt::resolve("double"_hs));

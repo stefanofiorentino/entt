@@ -1,8 +1,9 @@
 #include <gtest/gtest.h>
+#include <entt/lib/attribute.h>
 #include <entt/signal/emitter.hpp>
 #include "types.h"
 
-extern void emit_event(int, test_emitter &);
+ENTT_IMPORT void emit_event(int, test_emitter &);
 
 TEST(Lib, Emitter) {
     test_emitter emitter;

@@ -1,5 +1,5 @@
-#include <entt/core/type_traits.hpp>
+#include <entt/lib/attribute.h>
 
-ENTT_NAMED_STRUCT(event, {
+struct ENTT_API event {
     int payload;
-});
+};

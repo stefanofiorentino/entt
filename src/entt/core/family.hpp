@@ -3,6 +3,7 @@
 
 
 #include "../config/config.h"
+#include "../lib/attribute.h"
 
 
 namespace entt {
@@ -16,7 +17,7 @@ namespace entt {
  * identifiers.
  */
 template<typename...>
-class family {
+class ENTT_API family {
     inline static ENTT_MAYBE_ATOMIC(ENTT_ID_TYPE) identifier{};
 
 public:
